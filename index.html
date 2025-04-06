@@ -1,1 +1,1437 @@
-COucou
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoupleConnect - Améliorez votre relation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animation pour les transitions entre pages */
+        .page-transition {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .page-hidden {
+            transform: translateX(100%);
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .page-visible {
+            transform: translateX(0);
+            opacity: 1;
+            height: auto;
+        }
+        
+        /* Style personnalisé pour les messages */
+        .message-bubble {
+            max-width: 70%;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .message-partner {
+            background-color: #f3f4f6;
+            border-top-left-radius: 0;
+            align-self: flex-start;
+        }
+        
+        .message-user {
+            background-color: #6366f1;
+            color: white;
+            border-top-right-radius: 0;
+            align-self: flex-end;
+        }
+        
+        /* Animation de chargement */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Style pour le calendrier */
+        .calendar-day {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e0e7ff;
+        }
+        
+        .calendar-day.selected {
+            background-color: #6366f1;
+            color: white;
+        }
+        
+        /* Style pour l'éditeur de journal */
+        .journal-editor {
+            min-height: 200px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        /* Style pour les onglets */
+        .tab-active {
+            border-bottom: 3px solid #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Barre de navigation -->
+    <nav class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-bold">CoupleConnect</h1>
+            <button id="menuBtn" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Menu latéral -->
+    <div id="sideMenu" class="fixed inset-y-0 right-0 w-64 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-20">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-lg font-semibold">Menu</h2>
+            <button id="closeMenuBtn" class="text-gray-500 focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <div class="mb-6">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-user text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h3 id="userNameDisplay" class="font-medium">Mon Profil</h3>
+                        <p class="text-sm text-gray-500">En ligne</p>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('dashboard')">
+                        <i class="fas fa-home mr-3 text-indigo-600"></i>
+                        Tableau de bord
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('messaging')">
+                        <i class="fas fa-comments mr-3 text-indigo-600"></i>
+                        Messagerie
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('sessions')">
+                        <i class="fas fa-calendar-alt mr-3 text-indigo-600"></i>
+                        Sessions coaching
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('journal')">
+                        <i class="fas fa-book mr-3 text-indigo-600"></i>
+                        Journal de bord
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('exercises')">
+                        <i class="fas fa-tasks mr-3 text-indigo-600"></i>
+                        Exercices
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('resources')">
+                        <i class="fas fa-book-open mr-3 text-indigo-600"></i>
+                        Ressources
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('goals')">
+                        <i class="fas fa-bullseye mr-3 text-indigo-600"></i>
+                        Objectifs
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="showPage('profile')">
+                        <i class="fas fa-user-cog mr-3 text-indigo-600"></i>
+                        Mon profil
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-700" onclick="exportData()">
+                        <i class="fas fa-file-export mr-3 text-indigo-600"></i>
+                        Exporter données
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Overlay pour le menu -->
+    <div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden"></div>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto p-4 pb-20">
+        <!-- Page Tableau de bord (par défaut visible) -->
+        <div id="dashboard" class="page-transition page-visible">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">Bonjour, <span id="dashboardUserName">Partenaire</span>!</h2>
+                <p class="text-gray-600">Comment allez-vous aujourd'hui ?</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold">Prochaine session</h3>
+                        <i class="fas fa-calendar text-indigo-600"></i>
+                    </div>
+                    <div id="nextSessionInfo" class="text-gray-600">
+                        <p class="animate-pulse">Chargement...</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold">Objectif en cours</h3>
+                        <i class="fas fa-bullseye text-indigo-600"></i>
+                    </div>
+                    <div id="currentGoalInfo" class="text-gray-600">
+                        <p class="animate-pulse">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Votre progression</h3>
+                    <i class="fas fa-chart-line text-indigo-600"></i>
+                </div>
+                <div class="h-40">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Dernière entrée de journal</h3>
+                    <i class="fas fa-book text-indigo-600"></i>
+                </div>
+                <div id="lastJournalEntry" class="text-gray-600 border-l-2 border-indigo-600 pl-4 py-2">
+                    <p class="animate-pulse">Chargement...</p>
+                </div>
+                <button onclick="showPage('journal')" class="mt-3 text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    Voir tout le journal <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Messagerie -->
+        <div id="messaging" class="page-transition page-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Messagerie</h2>
+                <button onclick="refreshMessages()" class="text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-4">
+                <div class="flex border-b border-gray-200">
+                    <button id="inboxTab" class="flex-1 py-3 font-medium text-center tab-active" onclick="switchMessageTab('inbox')">
+                        Boîte de réception
+                    </button>
+                    <button id="draftsTab" class="flex-1 py-3 font-medium text-center" onclick="switchMessageTab('drafts')">
+                        Brouillons
+                    </button>
+                </div>
+                
+                <div id="inboxContent" class="p-4">
+                    <div id="messagesList" class="space-y-3">
+                        <!-- Messages seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun message pour le moment</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="draftsContent" class="p-4 hidden">
+                    <div id="draftsList" class="space-y-3">
+                        <!-- Brouillons seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-edit text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun brouillon pour le moment</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold mb-3">Nouveau message</h3>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">À</label>
+                    <select id="messageRecipient" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="coach">Coach</option>
+                        <option value="partner">Mon partenaire</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Message</label>
+                    <textarea id="messageContent" rows="3" class="w-full p-2 border border-gray-300 rounded" placeholder="Écrivez votre message ici..."></textarea>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="saveDraft()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        <i class="fas fa-save mr-2"></i> Enregistrer brouillon
+                    </button>
+                    <button onclick="sendMessage()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                        <i class="fas fa-paper-plane mr-2"></i> Envoyer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Sessions coaching -->
+        <div id="sessions" class="page-transition page-hidden">
+            <h2 class="text-2xl font-bold mb-6">Sessions coaching</h2>
+            
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold">Calendrier</h3>
+                    <div class="flex items-center space-x-2">
+                        <button id="prevMonth" class="p-1 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="currentMonth" class="font-medium">Mois 2023</span>
+                        <button id="nextMonth" class="p-1 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-1 mb-3">
+                    <div class="text-center font-medium text-sm py-1">Dim</div>
+                    <div class="text-center font-medium text-sm py-1">Lun</div>
+                    <div class="text-center font-medium text-sm py-1">Mar</div>
+                    <div class="text-center font-medium text-sm py-1">Mer</div>
+                    <div class="text-center font-medium text-sm py-1">Jeu</div>
+                    <div class="text-center font-medium text-sm py-1">Ven</div>
+                    <div class="text-center font-medium text-sm py-1">Sam</div>
+                </div>
+                
+                <div id="calendarDays" class="grid grid-cols-7 gap-1">
+                    <!-- Les jours du calendrier seront générés ici -->
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <h3 class="font-semibold mb-4">Sessions programmées</h3>
+                <div id="scheduledSessions" class="space-y-3">
+                    <!-- Sessions seront chargées ici -->
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-plus text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500">Aucune session programmée</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold mb-4">Planifier une nouvelle session</h3>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Date</label>
+                    <input type="date" id="sessionDate" class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Heure</label>
+                    <input type="time" id="sessionTime" class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Type de session</label>
+                    <select id="sessionType" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="video">Vidéo</option>
+                        <option value="audio">Audio</option>
+                        <option value="text">Chat</option>
+                        <option value="in_person">En personne</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Notes (optionnel)</label>
+                    <textarea id="sessionNotes" rows="2" class="w-full p-2 border border-gray-300 rounded" placeholder="Ajoutez des notes ou des sujets à aborder..."></textarea>
+                </div>
+                <button onclick="scheduleSession()" class="w-full py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    <i class="fas fa-calendar-plus mr-2"></i> Planifier la session
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Journal de bord -->
+        <div id="journal" class="page-transition page-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Journal de bord</h2>
+                <button onclick="showNewJournalEntry()" class="px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700">
+                    <i class="fas fa-plus"></i> Nouveau
+                </button>
+            </div>
+            
+            <div id="journalEntriesList" class="space-y-4">
+                <!-- Entrées de journal seront chargées ici -->
+                <div class="text-center py-12">
+                    <i class="fas fa-book-open text-4xl text-gray-300 mb-2"></i>
+                    <p class="text-gray-500">Aucune entrée de journal</p>
+                    <button onclick="showNewJournalEntry()" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                        <i class="fas fa-plus mr-2"></i> Créer votre première entrée
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Formulaire pour une nouvelle entrée (caché par défaut) -->
+            <div id="newJournalEntryForm" class="hidden bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold">Nouvelle entrée</h3>
+                    <button onclick="hideNewJournalEntry()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Titre (optionnel)</label>
+                    <input type="text" id="journalEntryTitle" class="w-full p-2 border border-gray-300 rounded" placeholder="Donnez un titre à votre entrée">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Date</label>
+                    <input type="date" id="journalEntryDate" class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Contenu</label>
+                    <div id="journalEntryContent" class="journal-editor" contenteditable="true" placeholder="Écrivez vos pensées, sentiments, ou réflexions ici..."></div>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="hideNewJournalEntry()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        Annuler
+                    </button>
+                    <button onclick="saveJournalEntry()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                        <i class="fas fa-save mr-2"></i> Enregistrer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Vue détaillée d'une entrée (caché par défaut) -->
+            <div id="journalEntryDetail" class="hidden bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="entryDetailTitle" class="font-semibold text-lg"></h3>
+                    <button onclick="hideJournalEntryDetail()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <i class="fas fa-calendar-day mr-2"></i>
+                    <span id="entryDetailDate"></span>
+                </div>
+                <div id="entryDetailContent" class="text-gray-700 mb-6"></div>
+                <div class="flex justify-between">
+                    <button onclick="deleteJournalEntry()" class="px-4 py-2 bg-red-100 text-red-600 rounded hover:bg-red-200">
+                        <i class="fas fa-trash mr-2"></i> Supprimer
+                    </button>
+                    <button onclick="editJournalEntry()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                        <i class="fas fa-edit mr-2"></i> Modifier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Exercices -->
+        <div id="exercises" class="page-transition page-hidden">
+            <h2 class="text-2xl font-bold mb-6">Exercices</h2>
+            
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                <div class="flex border-b border-gray-200">
+                    <button id="availableExercisesTab" class="flex-1 py-3 font-medium text-center tab-active" onclick="switchExerciseTab('available')">
+                        Disponibles
+                    </button>
+                    <button id="completedExercisesTab" class="flex-1 py-3 font-medium text-center" onclick="switchExerciseTab('completed')">
+                        Complétés
+                    </button>
+                </div>
+                
+                <div id="availableExercisesContent" class="p-4">
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold">Communication active</h3>
+                                <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">Recommandé</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Pratiquez l'écoute active avec votre partenaire pendant 15 minutes sans interruption.</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500"><i class="fas fa-clock mr-1"></i> 15 min</span>
+                                <button onclick="startExercise('communication_active')" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
+                                    Commencer
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold">Journal de gratitude</h3>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Nouveau</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Notez trois choses que vous appréciez chez votre partenaire chaque jour pendant une semaine.</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500"><i class="fas fa-calendar-week mr-1"></i> 7 jours</span>
+                                <button onclick="startExercise('journal_gratitude')" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
+                                    Commencer
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold">Temps de qualité</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Planifiez une activité que vous aimez faire ensemble sans distractions (téléphone, TV, etc.).</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500"><i class="fas fa-heart mr-1"></i> Relation</span>
+                                <button onclick="startExercise('temps_qualite')" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
+                                    Commencer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="completedExercisesContent" class="p-4 hidden">
+                    <div id="completedExercisesList" class="space-y-4">
+                        <!-- Exercices complétés seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun exercice complété</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold mb-3">Exercice en cours</h3>
+                <div id="currentExerciseInfo" class="text-center py-8">
+                    <i class="fas fa-tasks text-4xl text-gray-300 mb-2"></i>
+                    <p class="text-gray-500">Aucun exercice en cours</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Ressources -->
+        <div id="resources" class="page-transition page-hidden">
+            <h2 class="text-2xl font-bold mb-6">Ressources</h2>
+            
+            <div class="mb-4">
+                <div class="relative">
+                    <input type="text" id="resourceSearch" placeholder="Rechercher des ressources..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="bg-indigo-100 p-4">
+                        <h3 class="font-semibold text-indigo-800">Articles</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-3">
+                            <div class="border-b border-gray-100 pb-3">
+                                <h4 class="font-medium mb-1">5 Langages de l'amour</h4>
+                                <p class="text-sm text-gray-600 mb-2">Découvrez les différentes façons d'exprimer et de recevoir l'amour.</p>
+                                <button onclick="viewResource('article_langages_amour')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Lire <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="border-b border-gray-100 pb-3">
+                                <h4 class="font-medium mb-1">Résoudre les conflits</h4>
+                                <p class="text-sm text-gray-600 mb-2">Techniques pour gérer les désaccords de manière constructive.</p>
+                                <button onclick="viewResource('article_resoudre_conflits')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Lire <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium mb-1">Renforcer l'intimité</h4>
+                                <p class="text-sm text-gray-600 mb-2">Des conseils pour approfondir votre connexion émotionnelle.</p>
+                                <button onclick="viewResource('article_renforcer_intimite')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Lire <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="bg-indigo-100 p-4">
+                        <h3 class="font-semibold text-indigo-800">Vidéos</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-3">
+                            <div class="border-b border-gray-100 pb-3">
+                                <h4 class="font-medium mb-1">Communication non-violente</h4>
+                                <p class="text-sm text-gray-600 mb-2">Apprenez à exprimer vos besoins sans blâmer.</p>
+                                <button onclick="viewResource('video_communication')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Regarder <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="border-b border-gray-100 pb-3">
+                                <h4 class="font-medium mb-1">Exercices de connexion</h4>
+                                <p class="text-sm text-gray-600 mb-2">Des activités simples pour renforcer votre lien.</p>
+                                <button onclick="viewResource('video_exercices_connexion')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Regarder <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium mb-1">Gestion du stress en couple</h4>
+                                <p class="text-sm text-gray-600 mb-2">Comment soutenir mutuellement pendant les périodes stressantes.</p>
+                                <button onclick="viewResource('video_gestion_stress')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                    Regarder <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vue détaillée d'une ressource (caché par défaut) -->
+            <div id="resourceDetail" class="hidden bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="resourceDetailTitle" class="font-semibold text-lg"></h3>
+                    <button onclick="hideResourceDetail()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <span id="resourceDetailType" class="inline-block px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full"></span>
+                </div>
+                <div id="resourceDetailContent" class="mb-6">
+                    <!-- Contenu de la ressource sera chargé ici -->
+                </div>
+                <button onclick="hideResourceDetail()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour aux ressources
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Objectifs -->
+        <div id="goals" class="page-transition page-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Objectifs</h2>
+                <button onclick="showNewGoalForm()" class="px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700">
+                    <i class="fas fa-plus"></i> Nouveau
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow text-center">
+                    <div class="text-3xl font-bold text-indigo-600 mb-1" id="goalsActiveCount">0</div>
+                    <div class="text-sm text-gray-500">Actifs</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-1" id="goalsCompletedCount">0</div>
+                    <div class="text-sm text-gray-500">Complétés</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow text-center">
+                    <div class="text-3xl font-bold text-gray-600 mb-1" id="goalsArchivedCount">0</div>
+                    <div class="text-sm text-gray-500">Archivés</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                <div class="flex border-b border-gray-200">
+                    <button id="activeGoalsTab" class="flex-1 py-3 font-medium text-center tab-active" onclick="switchGoalTab('active')">
+                        Actifs
+                    </button>
+                    <button id="completedGoalsTab" class="flex-1 py-3 font-medium text-center" onclick="switchGoalTab('completed')">
+                        Complétés
+                    </button>
+                    <button id="archivedGoalsTab" class="flex-1 py-3 font-medium text-center" onclick="switchGoalTab('archived')">
+                        Archivés
+                    </button>
+                </div>
+                
+                <div id="activeGoalsContent" class="p-4">
+                    <div id="activeGoalsList" class="space-y-3">
+                        <!-- Objectifs actifs seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-bullseye text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun objectif actif</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="completedGoalsContent" class="p-4 hidden">
+                    <div id="completedGoalsList" class="space-y-3">
+                        <!-- Objectifs complétés seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun objectif complété</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="archivedGoalsContent" class="p-4 hidden">
+                    <div id="archivedGoalsList" class="space-y-3">
+                        <!-- Objectifs archivés seront chargés ici -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-archive text-4xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500">Aucun objectif archivé</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire pour un nouvel objectif (caché par défaut) -->
+            <div id="newGoalForm" class="hidden bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold">Nouvel objectif</h3>
+                    <button onclick="hideNewGoalForm()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Titre</label>
+                    <input type="text" id="goalTitle" class="w-full p-2 border border-gray-300 rounded" placeholder="Quel est votre objectif ?">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Description (optionnel)</label>
+                    <textarea id="goalDescription" rows="2" class="w-full p-2 border border-gray-300 rounded" placeholder="Ajoutez plus de détails..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de début</label>
+                        <input type="date" id="goalStartDate" class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date cible</label>
+                        <input type="date" id="goalTargetDate" class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 mb-1">Catégorie</label>
+                    <select id="goalCategory" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="communication">Communication</option>
+                        <option value="intimite">Intimité</option>
+                        <option value="confiance">Confiance</option>
+                        <option value="temps_ensemble">Temps ensemble</option>
+                        <option value="resolution_conflits">Résolution de conflits</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="hideNewGoalForm()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        Annuler
+                    </button>
+                    <button onclick="saveGoal()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                        <i class="fas fa-save mr-2"></i> Enregistrer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Vue détaillée d'un objectif (caché par défaut) -->
+            <div id="goalDetail" class="hidden bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="goalDetailTitle" class="font-semibold text-lg"></h3>
+                    <button onclick="hideGoalDetail()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <span id="goalDetailStatus" class="inline-block px-2 py-1 text-xs rounded-full"></span>
+                </div>
+                <div id="goalDetailDescription" class="text-gray-700 mb-4"></div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-sm text-gray-500">Date de début</div>
+                        <div id="goalDetailStartDate" class="font-medium"></div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500">Date cible</div>
+                        <div id="goalDetailTargetDate" class="font-medium"></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-500">Catégorie</div>
+                    <div id="goalDetailCategory" class="font-medium"></div>
+                </div>
+                <div class="mb-6">
+                    <div class="text-sm text-gray-500 mb-1">Progression</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="goalProgressBar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div id="goalProgressText" class="text-right text-sm text-gray-500 mt-1">0%</div>
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <button onclick="deleteGoal()" class="px-4 py-2 bg-red-100 text-red-600 rounded hover:bg-red-200">
+                            <i class="fas fa-trash mr-2"></i> Supprimer
+                        </button>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="updateGoalStatus('archived')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            <i class="fas fa-archive mr-2"></i> Archiver
+                        </button>
+                        <button onclick="editGoal()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                            <i class="fas fa-edit mr-2"></i> Modifier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Profil -->
+        <div id="profile" class="page-transition page-hidden">
+            <h2 class="text-2xl font-bold mb-6">Mon Profil</h2>
+            
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="flex flex-col items-center mb-4">
+                    <div class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center mb-3">
+                        <i class="fas fa-user text-4xl text-indigo-600"></i>
+                    </div>
+                    <h3 id="profileName" class="text-xl font-semibold">Nom Utilisateur</h3>
+                    <p class="text-gray-500">Membre depuis <span id="memberSince">2023</span></p>
+                </div>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Nom complet</label>
+                        <input type="text" id="fullName" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre nom complet">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre email">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de naissance</label>
+                        <input type="date" id="birthDate" class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">À propos de vous (optionnel)</label>
+                        <textarea id="about" rows="3" class="w-full p-2 border border-gray-300 rounded" placeholder="Décrivez-vous en quelques mots..."></textarea>
+                    </div>
+                </div>
+                
+                <button onclick="saveProfile()" class="w-full mt-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    <i class="fas fa-save mr-2"></i> Enregistrer les modifications
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <h3 class="font-semibold mb-3">Préférences</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-gray-700 mb-1">Notifications</label>
+                            <p class="text-sm text-gray-500">Activer les rappels et notifications</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="notificationsEnabled" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-gray-700 mb-1">Mode sombre</label>
+                            <p class="text-sm text-gray-500">Passer à l'interface sombre</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="darkModeEnabled" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold mb-3">Informations sur le partenaire</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Nom du partenaire</label>
+                        <input type="text" id="partnerName" class="w-full p-2 border border-gray-300 rounded" placeholder="Nom de votre partenaire">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Anniversaire de relation</label>
+                        <input type="date" id="relationshipAnniversary" class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                </div>
+                
+                <button onclick="savePartnerInfo()" class="w-full mt-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    <i class="fas fa-heart mr-2"></i> Enregistrer les informations
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Barre de navigation inférieure -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg flex justify-around items-center p-2 z-10 border-t border-gray-200">
+        <button onclick="showPage('dashboard')" class="flex flex-col items-center p-2 text-indigo-600">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-xs mt-1">Accueil</span>
+        </button>
+        <button onclick="showPage('messaging')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+            <i class="fas fa-comments text-lg"></i>
+            <span class="text-xs mt-1">Messages</span>
+        </button>
+        <button onclick="showPage('exercises')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+            <i class="fas fa-tasks text-lg"></i>
+            <span class="text-xs mt-1">Exercices</span>
+        </button>
+        <button onclick="showPage('goals')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+            <i class="fas fa-bullseye text-lg"></i>
+            <span class="text-xs mt-1">Objectifs</span>
+        </button>
+        <button onclick="showPage('profile')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+            <i class="fas fa-user text-lg"></i>
+            <span class="text-xs mt-1">Profil</span>
+        </button>
+    </nav>
+
+    <!-- Modal de notification -->
+    <div id="notificationModal" class="fixed top-4 right-4 w-72 bg-white rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="font-semibold" id="notificationTitle">Notification</h3>
+            <button onclick="hideNotification()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4" id="notificationContent">
+            Contenu de la notification
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Variables d'état
+        let currentPage = 'dashboard';
+        let currentExerciseTab = 'available';
+        let currentGoalTab = 'active';
+        let currentMessageTab = 'inbox';
+        let editingJournalEntryId = null;
+        let editingGoalId = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le menu
+            document.getElementById('menuBtn').addEventListener('click', toggleMenu);
+            document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
+            document.getElementById('menuOverlay').addEventListener('click', toggleMenu);
+            
+            // Initialiser le calendrier
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            });
+            
+            // Initialiser les écouteurs d'événements
+            initEventListeners();
+            
+            // Charger les données
+            loadProfile();
+            loadNextSession();
+            loadCurrentGoal();
+            loadJournalEntries();
+            loadMessages();
+            loadDrafts();
+            loadExercises();
+            loadGoals();
+            
+            // Rendre le calendrier
+            renderCalendar();
+            
+            // Initialiser le graphique de progression
+            initProgressChart();
+            
+            // Vérifier les notifications
+            checkForNotifications();
+        });
+        
+        // Fonctions d'initialisation
+        function initEventListeners() {
+            // Écouteur pour le mode sombre
+            document.getElementById('darkModeEnabled').addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('bg-gray-900', 'text-white');
+                    document.body.classList.remove('bg-gray-50', 'text-gray-800');
+                } else {
+                    document.body.classList.remove('bg-gray-900', 'text-white');
+                    document.body.classList.add('bg-gray-50', 'text-gray-800');
+                }
+            });
+        }
+        
+        function initProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                    datasets: [{
+                        label: 'Progression',
+                        data: [30, 40, 45, 50, 55, 60, 65],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Fonctions de navigation
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                menu.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        function showPage(pageId) {
+            // Cacher la page actuelle
+            document.getElementById(currentPage).classList.remove('page-visible');
+            document.getElementById(currentPage).classList.add('page-hidden');
+            
+            // Afficher la nouvelle page
+            document.getElementById(pageId).classList.remove('page-hidden');
+            document.getElementById(pageId).classList.add('page-visible');
+            
+            // Mettre à jour la page actuelle
+            currentPage = pageId;
+            
+            // Fermer le menu si ouvert
+            if (!document.getElementById('sideMenu').classList.contains('translate-x-full')) {
+                toggleMenu();
+            }
+            
+            // Faire défiler vers le haut
+            window.scrollTo(0, 0);
+            
+            // Charger les données si nécessaire
+            if (pageId === 'messaging') {
+                loadMessages();
+                loadDrafts();
+            } else if (pageId === 'sessions') {
+                loadScheduledSessions();
+            } else if (pageId === 'exercises') {
+                loadExercises();
+            } else if (pageId === 'goals') {
+                loadGoals();
+            }
+        }
+        
+        function switchExerciseTab(tab) {
+            currentExerciseTab = tab;
+            
+            // Mettre à jour les onglets actifs
+            document.getElementById('availableExercisesTab').classList.remove('tab-active');
+            document.getElementById('completedExercisesTab').classList.remove('tab-active');
+            
+            document.getElementById(`${tab}ExercisesTab`).classList.add('tab-active');
+            
+            // Afficher/masquer le contenu
+            document.getElementById('availableExercisesContent').classList.add('hidden');
+            document.getElementById('completedExercisesContent').classList.add('hidden');
+            
+            document.getElementById(`${tab}ExercisesContent`).classList.remove('hidden');
+        }
+        
+        function switchGoalTab(tab) {
+            currentGoalTab = tab;
+            
+            // Mettre à jour les onglets actifs
+            document.getElementById('activeGoalsTab').classList.remove('tab-active');
+            document.getElementById('completedGoalsTab').classList.remove('tab-active');
+            document.getElementById('archivedGoalsTab').classList.remove('tab-active');
+            
+            document.getElementById(`${tab}GoalsTab`).classList.add('tab-active');
+            
+            // Afficher/masquer le contenu
+            document.getElementById('activeGoalsContent').classList.add('hidden');
+            document.getElementById('completedGoalsContent').classList.add('hidden');
+            document.getElementById('archivedGoalsContent').classList.add('hidden');
+            
+            document.getElementById(`${tab}GoalsContent`).classList.remove('hidden');
+        }
+        
+        function switchMessageTab(tab) {
+            currentMessageTab = tab;
+            
+            // Mettre à jour les onglets actifs
+            document.getElementById('inboxTab').classList.remove('tab-active');
+            document.getElementById('draftsTab').classList.remove('tab-active');
+            
+            document.getElementById(`${tab}Tab`).classList.add('tab-active');
+            
+            // Afficher/masquer le contenu
+            document.getElementById('inboxContent').classList.add('hidden');
+            document.getElementById('draftsContent').classList.add('hidden');
+            
+            document.getElementById(`${tab}Content`).classList.remove('hidden');
+        }
+        
+        // Fonctions de calendrier
+        function renderCalendar() {
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            document.getElementById('currentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            let calendarHtml = '';
+            
+            // Ajouter des cellules vides pour les jours avant le premier jour du mois
+            for (let i = 0; i < startingDay; i++) {
+                calendarHtml += '<div class="h-10"></div>';
+            }
+            
+            // Ajouter les jours du mois
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(currentYear, currentMonth, i);
+                const isToday = date.toDateString() === new Date().toDateString();
+                
+                calendarHtml += `
+                    <div class="calendar-day ${isToday ? 'bg-indigo-100 text-indigo-800' : ''}" onclick="selectCalendarDay(${i})">
+                        ${i}
+                    </div>
+                `;
+            }
+            
+            document.getElementById('calendarDays').innerHTML = calendarHtml;
+        }
+        
+        function selectCalendarDay(day) {
+            // Enlever la sélection précédente
+            const prevSelected = document.querySelector('.calendar-day.selected');
+            if (prevSelected) {
+                prevSelected.classList.remove('selected');
+            }
+            
+            // Ajouter la sélection au jour cliqué
+            const days = document.querySelectorAll('.calendar-day');
+            days[day - 1 + new Date(currentYear, currentMonth, 1).getDay()].classList.add('selected');
+            
+            // Mettre à jour le formulaire de session avec la date sélectionnée
+            const selectedDate = new Date(currentYear, currentMonth, day);
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            document.getElementById('sessionDate').value = formattedDate;
+        }
+        
+        // Fonctions de profil
+        function loadProfile() {
+            const profile = JSON.parse(localStorage.getItem('coupleProfile')) || {
+                fullName: 'Nom Utilisateur',
+                email: '',
+                birthDate: '',
+                about: '',
+                partnerName: 'Mon Partenaire',
+                relationshipAnniversary: '',
+                notificationsEnabled: true,
+                darkModeEnabled: false,
+                memberSince: new Date().getFullYear()
+            };
+            
+            // Mettre à jour les champs du formulaire
+            document.getElementById('fullName').value = profile.fullName;
+            document.getElementById('email').value = profile.email;
+            document.getElementById('birthDate').value = profile.birthDate;
+            document.getElementById('about').value = profile.about;
+            document.getElementById('partnerName').value = profile.partnerName;
+            document.getElementById('relationshipAnniversary').value = profile.relationshipAnniversary;
+            document.getElementById('notificationsEnabled').checked = profile.notificationsEnabled;
+            document.getElementById('darkModeEnabled').checked = profile.darkModeEnabled;
+            
+            // Mettre à jour l'affichage
+            document.getElementById('profileName').textContent = profile.fullName;
+            document.getElementById('userNameDisplay').textContent = profile.fullName;
+            document.getElementById('dashboardUserName').textContent = profile.partnerName;
+            document.getElementById('memberSince').textContent = profile.memberSince;
+            
+            // Appliquer le mode sombre si activé
+            if (profile.darkModeEnabled) {
+                document.body.classList.add('bg-gray-900', 'text-white');
+                document.body.classList.remove('bg-gray-50', 'text-gray-800');
+            }
+        }
+        
+        function saveProfile() {
+            const profile = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                birthDate: document.getElementById('birthDate').value,
+                about: document.getElementById('about').value,
+                partnerName: document.getElementById('partnerName').value,
+                relationshipAnniversary: document.getElementById('relationshipAnniversary').value,
+                notificationsEnabled: document.getElementById('notificationsEnabled').checked,
+                darkModeEnabled: document.getElementById('darkModeEnabled').checked,
+                memberSince: document.getElementById('memberSince').textContent || new Date().getFullYear()
+            };
+            
+            localStorage.setItem('coupleProfile', JSON.stringify(profile));
+            
+            // Mettre à jour l'affichage
+            document.getElementById('profileName').textContent = profile.fullName;
+            document.getElementById('userNameDisplay').textContent = profile.fullName;
+            document.getElementById('dashboardUserName').textContent = profile.partnerName;
+            
+            showNotification('Profil mis à jour', 'Vos informations de profil ont été enregistrées avec succès.');
+        }
+        
+        function savePartnerInfo() {
+            const profile = JSON.parse(localStorage.getItem('coupleProfile')) || {};
+            profile.partnerName = document.getElementById('partnerName').value;
+            profile.relationshipAnniversary = document.getElementById('relationshipAnniversary').value;
+            
+            localStorage.setItem('coupleProfile', JSON.stringify(profile));
+            
+            // Mettre à jour l'affichage
+            document.getElementById('dashboardUserName').textContent = profile.partnerName;
+            
+            showNotification('Informations enregistrées', 'Les informations sur votre partenaire ont été mises à jour.');
+        }
+        
+        // Fonctions de messagerie
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('coupleMessages')) || [];
+            const messagesList = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                messagesList.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-comments text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500">Aucun message pour le moment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let messagesHtml = '';
+            messages.forEach(msg => {
+                const date = new Date(msg.timestamp);
+                const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                
+                messagesHtml += `
+                    <div class="bg-white p-3 rounded-lg shadow border border-gray-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-medium">${msg.recipient === 'coach' ? 'Coach' : 'Mon partenaire'}</span>
+                            <span class="text-xs text-gray-500">${formattedDate}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">${msg.content.substring(0, 60)}${msg.content.length > 60 ? '...' : ''}</p>
+                    </div>
+                `;
+            });
+            
+            messagesList.innerHTML = messagesHtml;
+        }
+        
+        function loadDrafts() {
+            const drafts = JSON.parse(localStorage.getItem('coupleMessageDrafts')) || [];
+            const draftsList = document.getElementById('draftsList');
+            
+            if (drafts.length === 0) {
+                draftsList.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-edit text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500">Aucun brouillon pour le moment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let draftsHtml = '';
+            drafts.forEach((draft, index) => {
+                draftsHtml += `
+                    <div class="bg-white p-3 rounded-lg shadow border border-gray-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-medium">${draft.recipient === 'coach' ? 'Coach' : 'Mon partenaire'}</span>
+                            <button onclick="deleteDraft(${index})" class="text-red-500 hover:text-red-700 text-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">${draft.content.substring(0, 60)}${draft.content.length > 60 ? '...' : ''}</p>
+                        <div class="flex justify-end">
+                            <button onclick="editDraft(${index})" class="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700">
+                                <i class="fas fa-edit mr-1"></i> Continuer
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            draftsList.innerHTML = draftsHtml;
+        }
+        
+        function saveDraft() {
+            const recipient = document.getElementById('messageRecipient').value;
+            const content = document.getElementById('messageContent').value.trim();
+            
+            if (!content) {
+                showNotification('Brouillon vide', 'Le message est vide, rien à enregistrer.');
+                return;
+            }
+            
+            const drafts = JSON.parse(localStorage.getItem('coupleMessageDrafts')) || [];
+            drafts.push({ recipient, content, timestamp: Date.now() });
+            
+            localStorage.setItem('coupleMessageDrafts', JSON.stringify(drafts));
+            
+            // Vider le champ de message
+            document.getElementById('messageContent').value = '';
+            
+            // Recharger les brouillons
+            loadDrafts();
+            
+            showNotification('Brouillon enregistré', 'Votre message a été enregistré comme brouillon.');
+        }
+        
+        function editDraft(index) {
+            const drafts = JSON.parse(localStorage.getItem('coupleMessageDrafts')) || [];
+            if (index >= 0 && index < drafts.length) {
+                const draft = drafts[index];
+                document.getElementById('messageRecipient').value = draft.recipient;
+                document.getElementById('messageContent').value = draft.content;
+                
+                // Supprimer le brouillon après l'avoir chargé pour édition
+                drafts.splice(index, 1);
+                localStorage.setItem('coupleMessageDrafts', JSON.stringify(drafts));
+                loadDrafts();
+                
+                // Basculer vers l'onglet de rédaction
+                switchMessageTab('inbox');
+                
+                // Focus sur le champ de message
+                document.getElementById('messageContent').focus();
+            }
+        }
+        
+        function deleteDraft(index) {
+            const drafts = JSON.parse(localStorage.getItem('coupleMessageDrafts')) || [];
+            if (index >= 0 && index < drafts.length) {
+                drafts.splice(index, 1);
+                localStorage.setItem('coupleMessageDrafts', JSON.stringify(drafts));
+                loadDrafts();
+                
+                showNotification('Brouillon supprimé', 'Le brouillon a été supprimé avec succès.');
+            }
+        }
+        
+        function sendMessage() {
+            const recipient = document.getElementById('messageRecipient').value;
+            const content = document.getElementById('messageContent').value.trim();
+            
+            if (!content) {
+                showNotification('Message vide', 'Veuillez écrire un message avant d\'envoyer.');
+                return;
+            }
+            
+            const messages = JSON.parse(localStorage.getItem('coupleMessages')) || [];
+            messages.push({
+                recipient,
+                content,
+                timestamp: Date.now(),
+                read: false
+            });
+            
+            localStorage.setItem('coupleMessages', JSON.stringify(messages));
+            
+            // Vider le champ de message
+            document.getElementById('messageContent').value = '';
+            
+            // Recharger les messages
+            loadMessages();
+            
+            showNotification('Message envoyé', 'Votre message a été envoyé avec succès.');
+            
+            // Simuler une réponse du coach après un délai
+            if (recipient === 'coach') {
+                setTimeout(() => {
+                    const responses = [
+                        "Merci pour votre message. J'y réfléchirai et vous répondrai plus en détail lors de notre prochaine session.",
+                        "C'est une réflexion intéressante. Avez-vous déjà essayé d'en parler directement avec votre partenaire ?",
+                        "Je comprends vos préoccupations. Nous pourrons travailler sur cela ensemble.",
+                        "Merci de partager cela avec moi. C'est un bon pas vers une meilleure communication.",
+                        "Votre message a été reçu. Pensez-vous que votre partenaire ressent la même chose ?"
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    const messages = JSON.parse(localStorage.getItem('coupleMessages')) || [];
+                    messages.push({
+                        recipient: 'user',
+                        content: randomResponse,
+                        timestamp: Date.now(),
+                        read: false
+                    });
+                    
+                    localStorage.setItem('coupleMessages', JSON.stringify(messages));
+                    
+                    // Recharger les messages si nous sommes sur la page de messagerie
+                    if (currentPage === 'messaging') {
+                        loadMessages();
+                    }
+                    
+                    // Afficher une notification
+                    showNotification('Nouvelle réponse', 'Vous avez reçu une réponse du coach.');
+                }, 3000);
+            }
+       
+</html>
